@@ -8,7 +8,6 @@
 
 #import "BUTSBundle.h"
 #import "BUTSTableView.h"
-#import "BUTSTableViewManager.h"
 
 
 @implementation BUTSBundle
@@ -17,7 +16,6 @@
 + (void)initialize;
 {
 	[BUTSTableView poseAsClass:[ASExtendedTableView class]];
-	//[BUTSTableViewManager poseAsClass:[TableViewManager class]];
 }
 
 
