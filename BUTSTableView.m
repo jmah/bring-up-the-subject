@@ -12,9 +12,6 @@
 @implementation BUTSTableView
 
 
-static BOOL returnDoubleRowHeight = NO;
-
-
 - (BOOL)BUTS_isAlterableTableView;
 {
 	// Test if we're the main table view in a more hacky way, because the window structure may not be hooked up yet
@@ -23,40 +20,16 @@ static BOOL returnDoubleRowHeight = NO;
 }
 
 
-- (NSRect)rectOfRow:(NSInteger)rowIndex;
-{
-	NSRect rect = [super rectOfRow:rowIndex];
-	if ([self BUTS_isAlterableTableView])
-	{
-		rect.origin.y += rowIndex * (rect.size.height - self.intercellSpacing.height);
-		rect.size.height *= 2.0f;
-		rect.size.height -= self.intercellSpacing.height;
-	}
-	return rect;
-}
-
-
-- (NSInteger)rowAtPoint:(NSPoint)point;
-{
-	if ([self BUTS_isAlterableTableView])
-	{
-		returnDoubleRowHeight = YES;
-		NSInteger row = [super rowAtPoint:point];
-		returnDoubleRowHeight = NO;
-		return row;
-	}
-	else
-		return [super rowAtPoint:point];
-}
-
-
 - (CGFloat)rowHeight;
 {
 	CGFloat height = [super rowHeight];
 	if ([self BUTS_isAlterableTableView])
-		if (returnDoubleRowHeight)
-			height *= 2.0f;
-	return height;
+		return height * 2.0f;
+	else if ([[self delegate] isKindOfClass:[ThreadDisplay class]])
+		// Thread display table view seems to take its height from the main table view, so it should be halved to bring it back to normal
+		return height / 2.0f;
+	else
+		return height;
 }
 
 
@@ -93,9 +66,7 @@ static BOOL returnDoubleRowHeight = NO;
 	// Draw grid ourselves, because [self setGridStyle:] doesn't work for me (works for a combination with vertical, but not horizontal)
 	if ([self BUTS_isAlterableTableView])
 	{
-		returnDoubleRowHeight = YES;
 		CGFloat rowHeight = [self rowHeight];
-		returnDoubleRowHeight = NO;
 		
 		CGFloat intercellHeight = self.intercellSpacing.height;
 		
